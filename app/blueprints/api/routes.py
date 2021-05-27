@@ -2,12 +2,13 @@ from flask import request, jsonify
 from . import bp as api
 from app.blueprints.blog.models import Post
 from .auth import token_auth
+from .models import Product
 
 
 @api.route('/posts', methods=['GET'])
 def get_posts():
     """
-    [GET] /api/products
+    [GET] /api/posts
     """
     posts = Post.query.all()
     return jsonify([p.to_dict() for p in posts])
@@ -16,7 +17,7 @@ def get_posts():
 @api.route('/posts/<int:id>', methods=['GET'])
 def get_post(id):
     """
-    [GET] /api/products
+    [GET] /api/posts
     """
     post = Post.query.get(id)
     return jsonify(post.to_dict())
@@ -41,7 +42,7 @@ def create_post():
 @token_auth.login_required
 def update_post(id):
     """
-    [PUT] /posts/<id>
+    [PUT] /api/posts/<id>
     """
     post = Post.query.get(id)
     user = token_auth.current_user()
@@ -63,3 +64,21 @@ def delete_post(id):
     post = Post.query.get(id)
     post.delete()
     return jsonify([p.to_dict() for p in Post.query.all()])
+
+
+@api.route('/products')
+def products():
+    """
+    [GET] /api/products
+    """
+    products = Product.query.all()
+    return jsonify([p.to_dict() for p in products])
+
+
+@api.route('/products/<int:id>')
+def single_product(id):
+    """
+    [GET] /api/products/<id>
+    """
+    p = Product.query.get_or_404(id)
+    return jsonify(p.to_dict())
